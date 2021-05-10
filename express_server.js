@@ -1,12 +1,12 @@
-const express = require("express");
+const express = require('express');
 const app = express();
 const PORT = 8080;
 
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b2xVn2: 'http://www.lighthouselabs.ca',
+  '9sm5xK': 'http://www.google.com',
 };
 
 app.get('/urls', (req, res) => {
@@ -23,7 +23,7 @@ app.get('/urls.json', (req, res) => {
 });
 
 app.get('/hello', (req, res) => {
-  const templateVars = { greeting: 'Hello, World'};
+  const templateVars = { greeting: 'Hello, World' };
   res.render('hello_world', templateVars);
 });
 
