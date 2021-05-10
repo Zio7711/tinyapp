@@ -25,8 +25,10 @@ app.get('/urls', (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send(generateRandomString());         // Respond with 'Ok' (we will replace this)
+  const randomURL = generateRandomString()
+  res.send(`Please redirect to this URL: localhost:8080/urls/${randomURL}`);         
+  urlDatabase[randomURL] = req.body.longURL;
+  console.log(urlDatabase);
 });
 
 app.get('/', (req, res) => {
