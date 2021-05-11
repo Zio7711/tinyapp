@@ -1,24 +1,22 @@
-const express = require('express');
+//import all the necessary packages.
+const express = require('express');  
 const morgan = require('morgan');
 const bodyParser = require("body-parser");
 const generateRandomString = require('./generateRandomString');
-
 const app = express();
+//set the server port.
 const PORT = 8080;
-
-
-
+//config ejs and add morgamMiddleware to track server activities.
 app.set('view engine', 'ejs');
 const morganMiddleware = morgan('dev');
-
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({extended: true})); //make the post data readable.
 app.use(morganMiddleware);
 
 const urlDatabase = {
   b2xVn2: 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com',
 };
-
+//create routes.
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
