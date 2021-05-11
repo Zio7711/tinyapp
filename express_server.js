@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const bodyParser = require("body-parser");
 const generateRandomString = require('./generateRandomString');
 const app = express();
+const cookieParser = require('cookie-parser');
 //set the server port.
 const PORT = 8080;
 //config ejs and add morgamMiddleware to track server activities.
@@ -66,6 +67,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //UPDATE
 app.post("/urls/:shortURL/edit",(req,res)=>{
   urlDatabase[req.params.shortURL] = `http://${req.body.newURL}`;
+  res.redirect('/urls')
+});
+
+//login cookie setup
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username)
+  console.log('login successful!')
   res.redirect('/urls')
 });
 
