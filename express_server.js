@@ -26,9 +26,9 @@ app.get('/urls', (req, res) => {
 
 app.post("/urls", (req, res) => {
   const randomURL = generateRandomString()
-  res.send(`Please redirect to this URL: localhost:8080/urls/${randomURL}`);         
+  const newShortURL = `http://localhost:${PORT}/urls/${randomURL}`
   urlDatabase[randomURL] = req.body.longURL;
-  console.log(urlDatabase);
+  res.redirect(newShortURL)  
 });
 
 app.get('/', (req, res) => {
@@ -51,6 +51,12 @@ app.get('/urls.json', (req, res) => {
 app.get('/hello', (req, res) => {
   const templateVars = { greeting: 'Hello, World' };
   res.render('hello_world', templateVars);
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = `http://${urlDatabase[req.params.shortURL]}`;
+  console.log(longURL)
+  res.redirect(longURL);
 });
 
 app.listen(PORT, () => {
