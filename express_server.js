@@ -25,10 +25,10 @@ app.get('/urls', (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const randomURL = generateRandomString()
-  const newShortURL = `http://localhost:${PORT}/urls/${randomURL}`
+  const randomURL = generateRandomString();
+  const newShortURL = `http://localhost:${PORT}/urls/${randomURL}`;
   urlDatabase[randomURL] = req.body.longURL;
-  res.redirect(newShortURL)  
+  res.redirect(newShortURL);
 });
 
 app.get('/', (req, res) => {
@@ -55,7 +55,7 @@ app.get('/hello', (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = `http://${urlDatabase[req.params.shortURL]}`;
-  console.log(longURL)
+  console.log(longURL);
   res.redirect(longURL);
 });
 
