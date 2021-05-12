@@ -7,7 +7,24 @@ const emailLookup = (obj, id) => {
   return false;
 };
 
-module.exports = emailLookup;
+const passwordCheck = (obj, email, password) => {
+  for (const key in obj) {
+    if (obj[key]['email'] === email && obj[key]['password'] === password) {
+      return true;
+    }
+  }
+  return false
+}
+
+const checkUserID = (obj, email, password) => {
+  for (const key in obj) {
+    if (obj[key]['email'] === email && obj[key]['password'] === password) {
+      return key;
+    }
+  }
+}
+
+module.exports = {emailLookup, passwordCheck, checkUserID};
 
 /* const users = { 
   "userRandomID": {
