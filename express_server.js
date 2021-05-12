@@ -80,7 +80,7 @@ app.get('/u/:shortURL', (req, res) => {
 
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
-  console.log('urlDatabase[req.params.shortURL]',urlDatabase[req.params.shortURL])
+  console.log('urlDatabase[req.params.shortURL]',urlDatabase[req.params.shortURL]);
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
 });
