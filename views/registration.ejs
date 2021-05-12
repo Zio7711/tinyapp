@@ -24,7 +24,11 @@
         <input class = "form-control" type = password name = password placeholder="Password">
         <button type="submit" class="btn btn-primary">Register</button>
         </div>
-    </form>       
+    </form>
+    
+    <% if (loginMsg) { %>
+      <p>Email already exist!!!</p>
+    <% } %>
   
   </main>
 

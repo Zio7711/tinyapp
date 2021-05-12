@@ -135,8 +135,15 @@ app.post('/logout', (req, res) => {
 //registration page
 app.get('/register', (req, res) => {
   const templateVars = {
-    user: users[req.cookies['user_id']]
+    user: users[req.cookies['user_id']],
   };
+  if (req.query === 'error') {
+    templateVars['loginMsg'] = req.cookies['loginMsg'];
+  } else {
+    res.clearCookie('loginMsg');
+    templateVars['loginMsg'] = req.cookies['loginMsg'];
+  }
+  console.log('templateVars', templateVars)
   res.render('registration', templateVars);
 });
 
@@ -146,7 +153,8 @@ app.post('/register', (req, res) => {
     res.redirect(400, '/register');
   } else {
     if (emailLookup(users, req.body.email)) {
-      res.send("email already registered");
+      res.cookie('loginMsg', "email aready exist!")
+      res.redirect('/register?error');
     } else {
       const randomID = generateRandomString();
       users[randomID] = {
@@ -155,6 +163,7 @@ app.post('/register', (req, res) => {
         password: req.body.password
       };
       res.cookie('user_id', randomID);
+      loginMsg = ''
       // res.cookie('allUsers', users);
       res.redirect('/urls');
     }
