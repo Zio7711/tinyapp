@@ -25,12 +25,11 @@ app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
   };
-  if (req.cookies) {
     templateVars.username = req.cookies['username'];
-  }
   res.render('urls_index', templateVars);
 });
 
+//post method to add new shoreURL-longURL pair into database.
 app.post('/urls', (req, res) => {
   const randomURL = generateRandomString();
   const newShortURL = `http://localhost:${PORT}/urls/${randomURL}`;
@@ -38,43 +37,44 @@ app.post('/urls', (req, res) => {
   res.redirect(newShortURL);
 });
 
+//setup homepage
 app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
+//setup create new URL page
 app.get('/urls/new', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
   };
-  if (req.cookies) {
-    templateVars.username = req.cookies['username'];
-  }
+  templateVars.username = req.cookies['username'];
   res.render('urls_new', templateVars);
 });
 
+//understand user's input urls as parameters
 app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
   };
-  if (req.cookies) {
     templateVars.username = req.cookies['username'];
-  }
-  res.render('urls_show', templateVars);
+    res.render('urls_show', templateVars);
 });
 
+//setup a page for database jason file
 app.get('/urls.json', (req, res) => {
   res.send(urlDatabase);
 });
 
+//setup hello page
 app.get('/hello', (req, res) => {
   const templateVars = { greeting: 'Hello, World' };
   res.render('hello_world', templateVars);
 });
 
+//redirect to longURL
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
-  // console.log('longURL', longURL);
   res.redirect(longURL);
 });
 
