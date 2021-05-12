@@ -47,10 +47,13 @@ app.get('/urls', (req, res) => {
 
 //post method to add new shoreURL-longURL pair into database.
 app.post('/urls', (req, res) => {
-  const randomURL = generateRandomString();
-  const newShortURL = `http://localhost:${PORT}/urls/${randomURL}`;
-  urlDatabase[randomURL] = `http://${req.body.longURL}`;
-  res.redirect(newShortURL);
+  if (req.cookies['user_id']) {
+    const randomURL = generateRandomString();
+    const newShortURL = `http://localhost:${PORT}/urls/${randomURL}`;
+    urlDatabase[randomURL] = `http://${req.body.longURL}`;
+    res.redirect(newShortURL);
+  } 
+  res.redirect('/urls');
 });
 
 //setup homepage
@@ -80,12 +83,6 @@ app.get('/urls/:shortURL', (req, res) => {
 //setup a page for database jason file
 app.get('/urls.json', (req, res) => {
   res.send(urlDatabase);
-});
-
-//setup hello page
-app.get('/hello', (req, res) => {
-  const templateVars = { greeting: 'Hello, World' };
-  res.render('hello_world', templateVars);
 });
 
 //redirect to longURL
