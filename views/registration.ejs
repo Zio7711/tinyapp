@@ -14,7 +14,6 @@
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
     <h3>Registration</h3>
-
     <form class="form-inline" action="/register" method="Post">  
       <div class="form-group mb-2">
         <label>Email address:</label>
@@ -24,13 +23,11 @@
         <input class = "form-control" type = password name = password placeholder="Password">
         <button type="submit" class="btn btn-primary">Register</button>
         </div>
-    </form>
-    
-    <% if (loginMsg) { %>
-      <p>Email already exist!!!</p>
-    <% } %>
-  
+    </form>  
   </main>
+
+  <p style="margin: 1em;">You will login automatically after registration.</p>
+
   
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
