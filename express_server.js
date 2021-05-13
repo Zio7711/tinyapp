@@ -66,14 +66,17 @@ app.post('/urls', (req, res) => {
       longURL: `http://${req.body.longURL}`,
       userID: req.session.user_id,
     };
-    res.redirect(newShortURL);
+    return res.redirect(newShortURL);
   }
   res.redirect('/urls');
 });
 
 //HOME PAGE REDIRECT TO /URLS
 app.get('/', (req, res) => {
-  res.redirect('/urls');
+  if (req.session.user_id) {
+    return res.redirect('/urls');
+  }
+  res.redirect('/login');
 });
 
 //CREATE NEW shortURLS
@@ -87,12 +90,21 @@ app.get('/urls/new', (req, res) => {
 
 //understand user's input urls as parameters
 app.get('/urls/:shortURL', (req, res) => {
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL]['longURL'],
-  };
-  templateVars.user = users[req.session.user_id];
-  res.render('urls_show', templateVars);
+  if (!urlDatabase[req.params.shortURL]) {
+    return res.status(404).send("ShortURL is not found!")
+  }
+
+  if (req.session.user_id === urlDatabase[req.params.shortURL]['userID']) {
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL]['longURL'],
+    };
+    templateVars.user = users[req.session.user_id];
+    res.render('urls_show', templateVars);
+  } else {
+    return res.status(403).send("Permission denied")
+  }
+
 });
 
 //URLS JASON
@@ -102,6 +114,9 @@ app.get('/urls.json', (req, res) => {
 
 //REDIRECT TO LONGURL
 app.get('/u/:shortURL', (req, res) => {
+  if (!urlDatabase[req.params.shortURL]) {
+    return res.status(404).send('Page does not exits!')
+  }
   const longURL = urlDatabase[req.params.shortURL]['longURL'];
   res.redirect(longURL);
 });
@@ -120,7 +135,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 //UPDATE
-app.post('/urls/:shortURL/edit', (req, res) => {
+app.post('/urls/:shortURL', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     return res.status(400).send('Page not found!');
   }
