@@ -152,12 +152,6 @@ app.get('/register', (req, res) => {
   const templateVars = {
     user: users[req.cookies['user_id']],
   };
-  if (req.query === 'error') {
-    templateVars['loginMsg'] = req.cookies['loginMsg'];
-  } else {
-    res.clearCookie('loginMsg');
-    templateVars['loginMsg'] = req.cookies['loginMsg'];
-  }
   res.render('registration', templateVars);
 });
 
@@ -167,8 +161,7 @@ app.post('/register', (req, res) => {
     return res.status(400).send("Do not leave it blank!");
   } else {
     if (emailLookup(users, req.body.email)) {
-      res.cookie('loginMsg', "email aready exist!")
-      res.redirect('/register?error');
+      res.status(400).send("email already exist!");
     } else {
       const randomID = generateRandomString();
       users[randomID] = {
