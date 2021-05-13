@@ -12,9 +12,11 @@
 
 <body>
   <%- include('partials/_header') %>
-  
+  <div class="card text-center">
   <% if (!user) { %>
     <h1>Please Log In First! This Is Not Free!</h1>
+    <img  src="https://lh3.googleusercontent.com/proxy/tzmkOG1zhOGCLQhNlD-C4YxAhJqf91JjSaIPibb5kw5obmu8jZURmS5iY8HEOzsgUcQn_7ZmppPNonm_KZk_DBmKC4RyfENLE47abeqxE3rK3H_QnoxWNZY7pg">
+    <img style="margin: auto;background-color: hsl(0, 0%, 90%);transition: background-color 300ms;" src="https://mms.businesswire.com/media/20210329005174/en/821159/23/lhl-logo.jpg">
     <% } else { %>
       
       <main style="margin: 1em;">
@@ -48,11 +50,8 @@
               </tr>
               <%}%>
           <% } %>
+          <a class="nav-item nav-link" href="/urls/new">Create a New Short Link</a>
         <% } %>
-
-
-
-
 
       </tbody>
     </table>
@@ -61,5 +60,7 @@
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+</div>
 </body>
 </html>
