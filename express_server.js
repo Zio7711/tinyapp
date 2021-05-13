@@ -19,9 +19,10 @@ app.use(morganMiddleware);
 
 //hard coded databases
 const urlDatabase = {
-  b2xVn2: 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com',
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" }
 };
+
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -50,7 +51,7 @@ app.post('/urls', (req, res) => {
   if (req.cookies['user_id']) {
     const randomURL = generateRandomString();
     const newShortURL = `http://localhost:${PORT}/urls/${randomURL}`;
-    urlDatabase[randomURL] = `http://${req.body.longURL}`;
+    urlDatabase[randomURL] = { longURL: `http://${req.body.longURL}`, userID: req.cookies['user_id']};
     res.redirect(newShortURL);
   } 
   res.redirect('/urls');
@@ -74,7 +75,7 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL]['longURL'],
   };
   templateVars.user = users[req.cookies['user_id']];
   res.render('urls_show', templateVars);
@@ -87,20 +88,36 @@ app.get('/urls.json', (req, res) => {
 
 //redirect to longURL
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL]['longURL'];
   res.redirect(longURL);
 });
 
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
+  if (!urlDatabase[req.params.shortURL]) {
+    res.redirect(404, '/urls')
+  } else {
+    if (urlDatabase[req.params.shortURL]['userID'] === req.cookies['user_id']) {
+      delete urlDatabase[req.params.shortURL];
+      res.redirect('/urls');
+    } else {
+      res.redirect(403, '/urls')
+    }
+  }
 });
 
 //UPDATE
 app.post('/urls/:shortURL/edit', (req, res) => {
-  urlDatabase[req.params.shortURL] = `http://${req.body.newURL}`;
-  res.redirect('/urls');
+  if (!urlDatabase[req.params.shortURL]) {
+    res.redirect(404, '/urls')
+  } else {
+    if (urlDatabase[req.params.shortURL]['userID'] === req.cookies['user_id']) {
+      urlDatabase[req.params.shortURL]['longURL'] = `http://${req.body.newURL}`;
+      res.redirect('/urls');
+    } else {
+      res.redirect(403, '/urls')
+    }
+  }
 });
 
 //login get method
