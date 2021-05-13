@@ -95,7 +95,8 @@ app.get('/u/:shortURL', (req, res) => {
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
-    res.redirect(404, '/urls')
+    return res.status(404).send("Page not found");
+    // res.redirect(404, '/urls')
   } else {
     if (urlDatabase[req.params.shortURL]['userID'] === req.cookies['user_id']) {
       delete urlDatabase[req.params.shortURL];
@@ -136,7 +137,7 @@ app.post('/login', (req, res) => {
     res.cookie('user_id', checkUserID(users, testEmail, testPassword))
     res.redirect('/urls');
   } else {
-    res.redirect(403, '/login')
+    return res.status(403).send("Please check your username and password!")
   }
 });
 
@@ -163,7 +164,7 @@ app.get('/register', (req, res) => {
 //save registration info into account database
 app.post('/register', (req, res) => {
   if (!req.body.email || !req.body.password) {
-    res.redirect(400, '/register');
+    return res.status(400).send("Do not leave it blank!");
   } else {
     if (emailLookup(users, req.body.email)) {
       res.cookie('loginMsg', "email aready exist!")
@@ -177,7 +178,6 @@ app.post('/register', (req, res) => {
       };
       res.cookie('user_id', randomID);
       loginMsg = ''
-      // res.cookie('allUsers', users);
       res.redirect('/urls');
     }
   }
