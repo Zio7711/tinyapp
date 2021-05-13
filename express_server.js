@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const generateRandomString = require('./generateRandomString');
 const app = express();
 const cookieParser = require('cookie-parser');
-const getUserByEmail = require('./helper');
+const { getUserByEmail } = require('./helpers');
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
@@ -145,13 +145,13 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const testEmail = req.body.email;
   const testPassword = req.body.password;
-  if (!getUserByEmail(users, testEmail)) {
+  if (!getUserByEmail(testEmail, users)) {
     return res.status(403).send('Username does not exist!');
   }
   const userHashedPassword =
-    users[getUserByEmail(users, testEmail)]['hashedPassword'];
+    users[getUserByEmail(testEmail, users)]['hashedPassword'];
   if (bcrypt.compareSync(testPassword, userHashedPassword)) {
-    req.session.user_id = getUserByEmail(users, testEmail);
+    req.session.user_id = getUserByEmail(testEmail, users);
     res.redirect('/urls');
   } else {
     return res.status(403).send('Please check your username and password!');
@@ -178,7 +178,7 @@ app.post('/register', (req, res) => {
     return res.status(400).send('Do not leave it blank!');
   }
 
-  if (getUserByEmail(users, req.body.email)) {
+  if (getUserByEmail(req.body.email, users)) {
     return res.status(400).send('email already exist!');
   }
 
