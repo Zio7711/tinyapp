@@ -26,7 +26,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 #### Main page if user is not logged in
 !["Screenshot of main page if user is not logged in"](https://github.com/Zio7711/tinyapp/blob/master/docs/loginWarning.png?raw=true)
 
-#### Main page if user is logged in"
+#### Main page if user is logged in
 !["Screenshot of main page if user is logged in"](https://github.com/Zio7711/tinyapp/blob/master/docs/mainPage.png?raw=true)
 
 #### Registration page
