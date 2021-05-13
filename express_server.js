@@ -5,8 +5,8 @@ const bodyParser = require('body-parser');
 const generateRandomString = require('./generateRandomString');
 const app = express();
 const cookieParser = require('cookie-parser');
-const {emailLookup, passwordCheck, checkUserID} = require("./emailLookup");
-const bcrypt = require('bcrypt')
+const getUserByEmail = require('./helper');
+const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
 const PORT = 8080;
@@ -18,28 +18,30 @@ app.use(bodyParser.urlencoded({ extended: true })); //make the post data readabl
 app.use(cookieParser());
 app.use(morganMiddleware);
 app.use(express.static('public'));
-app.use(cookieSession({
-  name: 'session',
-  keys: ['key1', 'key2']
-}));
+app.use(
+  cookieSession({
+    name: 'session',
+    keys: ['key1', 'key2'],
+  })
+);
 
 //HARD CODE DATABASE
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" }
+  b6UTxQ: { longURL: 'https://www.tsn.ca', userID: 'userRandomID' },
+  i3BoGr: { longURL: 'https://www.google.ca', userID: 'userRandomID' },
 };
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    hashedPassword: bcrypt.hashSync("purple-monkey-dinosaur", 10)
+  userRandomID: {
+    id: 'userRandomID',
+    email: 'user@example.com',
+    hashedPassword: bcrypt.hashSync('purple-monkey-dinosaur', 10),
   },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    hashedPassword: bcrypt.hashSync("dishwasher-funk", 10)
-  }
+  user2RandomID: {
+    id: 'user2RandomID',
+    email: 'user2@example.com',
+    hashedPassword: bcrypt.hashSync('dishwasher-funk', 10),
+  },
 };
 
 //
@@ -55,21 +57,23 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-
 //POST URLS MAIN PAGE
 app.post('/urls', (req, res) => {
   if (req.session.user_id) {
     const randomURL = generateRandomString();
     const newShortURL = `/urls/${randomURL}`;
-    urlDatabase[randomURL] = { longURL: `http://${req.body.longURL}`, userID: req.session.user_id};
+    urlDatabase[randomURL] = {
+      longURL: `http://${req.body.longURL}`,
+      userID: req.session.user_id,
+    };
     res.redirect(newShortURL);
-  } 
+  }
   res.redirect('/urls');
 });
 
 //HOME PAGE REDIRECT TO /URLS
 app.get('/', (req, res) => {
-  res.redirect('/urls')
+  res.redirect('/urls');
 });
 
 //CREATE NEW shortURLS
@@ -105,53 +109,53 @@ app.get('/u/:shortURL', (req, res) => {
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
-    return res.status(404).send("Page not found");
-    // res.redirect(404, '/urls')
+    return res.status(404).send('Page not found');
+  }
+  if (urlDatabase[req.params.shortURL]['userID'] === req.session.user_id) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect('/urls');
   } else {
-    if (urlDatabase[req.params.shortURL]['userID'] === req.session.user_id) {
-      delete urlDatabase[req.params.shortURL];
-      res.redirect('/urls');
-    } else {
-      res.redirect(403, '/urls')
-    }
+    res.status(403).send('You do not have permission!');
   }
 });
 
 //UPDATE
 app.post('/urls/:shortURL/edit', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
-    res.redirect(404, '/urls')
+    return res.status(400).send('Page not found!');
+  }
+
+  if (urlDatabase[req.params.shortURL]['userID'] === req.session.user_id) {
+    urlDatabase[req.params.shortURL]['longURL'] = `http://${req.body.newURL}`;
+    res.redirect('/urls');
   } else {
-    if (urlDatabase[req.params.shortURL]['userID'] ===  req.session.user_id) {
-      urlDatabase[req.params.shortURL]['longURL'] = `http://${req.body.newURL}`;
-      res.redirect('/urls');
-    } else {
-      res.redirect(403, '/urls')
-    }
+    res.status(403).send('You do not have permission!');
   }
 });
 
 //LOGIN
 app.get('/login', (req, res) => {
   const templateVars = {
-    user: users[req.session.user_id]
+    user: users[req.session.user_id],
   };
-  res.render('login', templateVars)
+  res.render('login', templateVars);
 });
 
 //POST LOGIN
 app.post('/login', (req, res) => {
   const testEmail = req.body.email;
   const testPassword = req.body.password;
-
-  if (passwordCheck(users, testEmail, testPassword)) {
-    req.session.user_id = checkUserID(users, testEmail, testPassword)
+  if (!getUserByEmail(users, testEmail)) {
+    return res.status(403).send('Username does not exist!');
+  }
+  const userHashedPassword =
+    users[getUserByEmail(users, testEmail)]['hashedPassword'];
+  if (bcrypt.compareSync(testPassword, userHashedPassword)) {
+    req.session.user_id = getUserByEmail(users, testEmail);
     res.redirect('/urls');
-    console.log('users',users)
   } else {
-    return res.status(403).send("Please check your username and password!")
-  } 
-  
+    return res.status(403).send('Please check your username and password!');
+  }
 });
 
 //LOGOUT
@@ -163,7 +167,7 @@ app.post('/logout', (req, res) => {
 //REGISTRATION
 app.get('/register', (req, res) => {
   const templateVars = {
-    user: users[req.session.user_id]
+    user: users[req.session.user_id],
   };
   res.render('registration', templateVars);
 });
@@ -171,24 +175,23 @@ app.get('/register', (req, res) => {
 //POST REGISTRATION
 app.post('/register', (req, res) => {
   if (!req.body.email || !req.body.password) {
-    return res.status(400).send("Do not leave it blank!");
-  } else {
-    if (emailLookup(users, req.body.email)) {
-      res.status(400).send("email already exist!");
-    } else {
-      const randomID = generateRandomString();
-      const inputPassword = req.body.password;
-      const hashedPassword = bcrypt.hashSync(inputPassword, 10);
-      users[randomID] = {
-        id: randomID,
-        email: req.body.email,
-        hashedPassword
-      };
-      // res.cookie('user_id', randomID);
-      req.session.user_id = randomID
-      res.redirect('/urls');
-    }
+    return res.status(400).send('Do not leave it blank!');
   }
+
+  if (getUserByEmail(users, req.body.email)) {
+    return res.status(400).send('email already exist!');
+  }
+
+  const randomID = generateRandomString();
+  const inputPassword = req.body.password;
+  const hashedPassword = bcrypt.hashSync(inputPassword, 10);
+  users[randomID] = {
+    id: randomID,
+    email: req.body.email,
+    hashedPassword,
+  };
+  req.session.user_id = randomID;
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
