@@ -1,4 +1,4 @@
-//import all the necessary packages.
+//IMPORT PACKAGES
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
@@ -7,9 +7,9 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const {emailLookup, passwordCheck, checkUserID} = require("./emailLookup");
 
-//set the server port.
 const PORT = 8080;
-//config ejs and add morgamMiddleware to track server activities.
+
+//MIDDLEWARE
 app.set('view engine', 'ejs');
 const morganMiddleware = morgan('dev');
 app.use(bodyParser.urlencoded({ extended: true })); //make the post data readable.
@@ -17,7 +17,7 @@ app.use(cookieParser());
 
 app.use(morganMiddleware);
 
-//hard coded databases
+//HARD CODE DATABASE
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
   i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" }
@@ -36,17 +36,21 @@ const users = {
   }
 };
 
-//create routes.
+//
+//ROUTES
+//
+
+//URLS MAIN PAGE
 app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
   };
   templateVars.user = users[req.cookies['user_id']];
-  // templateVars.user = req.cookies['allUsers'][req.cookies['user_id']];
   res.render('urls_index', templateVars);
 });
 
-//post method to add new shoreURL-longURL pair into database.
+
+//POST URLS MAIN PAGE
 app.post('/urls', (req, res) => {
   if (req.cookies['user_id']) {
     const randomURL = generateRandomString();
@@ -57,12 +61,12 @@ app.post('/urls', (req, res) => {
   res.redirect('/urls');
 });
 
-//setup homepage
+//HOME PAGE REDIRECT TO /URLS
 app.get('/', (req, res) => {
   res.redirect('/urls')
 });
 
-//setup create new URL page
+//CREATE NEW shortURLS
 app.get('/urls/new', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
@@ -81,12 +85,12 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-//setup a page for database jason file
+//URLS JASON
 app.get('/urls.json', (req, res) => {
   res.send(urlDatabase);
 });
 
-//redirect to longURL
+//REDIRECT TO LONGURL
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL]['longURL'];
   res.redirect(longURL);
@@ -121,7 +125,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
   }
 });
 
-//login get method
+//LOGIN
 app.get('/login', (req, res) => {
   const templateVars = {
     user: users[req.cookies['user_id']]
@@ -129,7 +133,7 @@ app.get('/login', (req, res) => {
   res.render('login', templateVars)
 });
 
-//login cookie setup
+//POST LOGIN
 app.post('/login', (req, res) => {
   const testEmail = req.body.email;
   const testPassword = req.body.password;
@@ -141,13 +145,13 @@ app.post('/login', (req, res) => {
   }
 });
 
-//logout
+//LOGOUT
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
-//registration page
+//REGISTRATION
 app.get('/register', (req, res) => {
   const templateVars = {
     user: users[req.cookies['user_id']],
@@ -155,7 +159,7 @@ app.get('/register', (req, res) => {
   res.render('registration', templateVars);
 });
 
-//save registration info into account database
+//POST REGISTRATION
 app.post('/register', (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send("Do not leave it blank!");
@@ -170,7 +174,6 @@ app.post('/register', (req, res) => {
         password: req.body.password
       };
       res.cookie('user_id', randomID);
-      loginMsg = ''
       res.redirect('/urls');
     }
   }
