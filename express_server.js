@@ -6,6 +6,7 @@ const generateRandomString = require('./generateRandomString');
 const app = express();
 const cookieParser = require('cookie-parser');
 const {emailLookup, passwordCheck, checkUserID} = require("./emailLookup");
+const bcrypt = require('bcrypt')
 
 const PORT = 8080;
 
@@ -14,8 +15,8 @@ app.set('view engine', 'ejs');
 const morganMiddleware = morgan('dev');
 app.use(bodyParser.urlencoded({ extended: true })); //make the post data readable.
 app.use(cookieParser());
-
 app.use(morganMiddleware);
+app.use(express.static('public'));
 
 //HARD CODE DATABASE
 const urlDatabase = {
@@ -27,12 +28,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    hashedPassword: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    hashedPassword: bcrypt.hashSync("dishwasher-funk", 10)
   }
 };
 
@@ -137,12 +138,15 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const testEmail = req.body.email;
   const testPassword = req.body.password;
+
   if (passwordCheck(users, testEmail, testPassword)) {
     res.cookie('user_id', checkUserID(users, testEmail, testPassword))
     res.redirect('/urls');
+    console.log('users',users)
   } else {
     return res.status(403).send("Please check your username and password!")
-  }
+  } 
+  
 });
 
 //LOGOUT
@@ -168,10 +172,12 @@ app.post('/register', (req, res) => {
       res.status(400).send("email already exist!");
     } else {
       const randomID = generateRandomString();
+      const inputPassword = req.body.password;
+      const hashedPassword = bcrypt.hashSync(inputPassword, 10);
       users[randomID] = {
         id: randomID,
         email: req.body.email,
-        password: req.body.password
+        hashedPassword
       };
       res.cookie('user_id', randomID);
       res.redirect('/urls');

@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const emailLookup = (obj, id) => {
   for (const key in obj) {
     if (obj[key]['email'] === id) {
@@ -9,7 +10,7 @@ const emailLookup = (obj, id) => {
 
 const passwordCheck = (obj, email, password) => {
   for (const key in obj) {
-    if (obj[key]['email'] === email && obj[key]['password'] === password) {
+    if (obj[key]['email'] === email && bcrypt.compareSync(password, obj[key]['hashedPassword'])) {
       return true;
     }
   }
@@ -18,7 +19,7 @@ const passwordCheck = (obj, email, password) => {
 
 const checkUserID = (obj, email, password) => {
   for (const key in obj) {
-    if (obj[key]['email'] === email && obj[key]['password'] === password) {
+    if (obj[key]['email'] === email && bcrypt.compareSync(password, obj[key]['hashedPassword'])) {
       return key;
     }
   }
