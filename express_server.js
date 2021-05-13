@@ -50,7 +50,7 @@ app.get('/urls', (req, res) => {
 app.post('/urls', (req, res) => {
   if (req.cookies['user_id']) {
     const randomURL = generateRandomString();
-    const newShortURL = `http://localhost:${PORT}/urls/${randomURL}`;
+    const newShortURL = `/urls/${randomURL}`;
     urlDatabase[randomURL] = { longURL: `http://${req.body.longURL}`, userID: req.cookies['user_id']};
     res.redirect(newShortURL);
   } 
@@ -59,7 +59,7 @@ app.post('/urls', (req, res) => {
 
 //setup homepage
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  res.redirect('/urls')
 });
 
 //setup create new URL page
@@ -157,7 +157,6 @@ app.get('/register', (req, res) => {
     res.clearCookie('loginMsg');
     templateVars['loginMsg'] = req.cookies['loginMsg'];
   }
-  console.log('templateVars', templateVars)
   res.render('registration', templateVars);
 });
 
