@@ -91,7 +91,7 @@ app.get('/urls/new', (req, res) => {
 //understand user's input urls as parameters
 app.get('/urls/:shortURL', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
-    return res.status(404).send("ShortURL is not found!")
+    return res.status(404).send("ShortURL is not found!");
   }
 
   if (req.session.user_id === urlDatabase[req.params.shortURL]['userID']) {
@@ -102,7 +102,7 @@ app.get('/urls/:shortURL', (req, res) => {
     templateVars.user = users[req.session.user_id];
     res.render('urls_show', templateVars);
   } else {
-    return res.status(403).send("Permission denied")
+    return res.status(403).send("Permission denied");
   }
 
 });
@@ -115,7 +115,7 @@ app.get('/urls.json', (req, res) => {
 //REDIRECT TO LONGURL
 app.get('/u/:shortURL', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
-    return res.status(404).send('Page does not exits!')
+    return res.status(404).send('Page does not exits!');
   }
   const longURL = urlDatabase[req.params.shortURL]['longURL'];
   res.redirect(longURL);
@@ -166,7 +166,7 @@ app.post('/login', (req, res) => {
   const userHashedPassword =
     users[getUserByEmail(testEmail, users)]['hashedPassword'];
   if (bcrypt.compareSync(testPassword, userHashedPassword)) {
-    req.session.user_id = getUserByEmail(testEmail, users);
+    req.session['user_id'] = getUserByEmail(testEmail, users);
     res.redirect('/urls');
   } else {
     return res.status(403).send('Please check your username and password!');
@@ -205,7 +205,7 @@ app.post('/register', (req, res) => {
     email: req.body.email,
     hashedPassword,
   };
-  req.session.user_id = randomID;
+  req.session['user_id'] = randomID;
   res.redirect('/urls');
 });
 
