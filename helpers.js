@@ -1,21 +1,10 @@
-/* const bcrypt = require('bcrypt');
-
-const passwordCheck = (obj, email, password) => {
-  for (const key in obj) {
-    if (obj[key]['email'] === email && bcrypt.compareSync(password, obj[key]['hashedPassword'])) {
-      return true;
-    }
-  }
-  return false
-} */
-
 const getUserByEmail = (email, users) => {
   for (const user in users) {
     if (users[user]['email'] === email) {
       return user;
     }
   }
-  return undefined
+  return undefined;
 }
 
 module.exports = { getUserByEmail };
