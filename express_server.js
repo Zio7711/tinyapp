@@ -7,6 +7,7 @@ const app = express();
 const { getUserByEmail } = require('./helpers');
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
 
 const PORT = 8080;
 
@@ -16,6 +17,7 @@ const morganMiddleware = morgan('dev');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morganMiddleware);
 app.use(express.static('public'));
+app.use(methodOverride('_method'))
 app.use(
   cookieSession({
     name: 'session',
@@ -119,7 +121,7 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 //DELETE
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     return res.status(404).send('Page not found');
   }
@@ -132,7 +134,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 //UPDATE
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     return res.status(400).send('Page not found!');
   }

@@ -19,7 +19,7 @@
   </div>
 
   <div class="card text-center"> 
-  <form action="/urls/<%= shortURL %>" method="POST">
+  <form action="/urls/<%= shortURL %>?_method=PUT" method="POST">
     <div class="input-wrap">
       <h3>Edit</h3>
       <label for="newURL" class="label">New URL:</label>
